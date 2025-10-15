@@ -7,6 +7,8 @@ to be used in a pixel-art setting.
 ## Prerequisites
 - SDL2
 - cmake (for building the library)
+- [carena](https://github.com/broskobandi/carena.git)
+- [cvec](https://github.com/broskobandi/cvec.git)
 - [ctest](https://github.com/broskobandi/ctest.git) (for running the tests)
 ## Usage
 ```c
