@@ -72,6 +72,7 @@ int main(void) {
 
 	return 0;
 }
+```
 ## Installation
 ```bash
 git clone https://github.com/broskobandi/SDL_fire.git &&
@@ -81,7 +82,6 @@ cd build &&
 cmake .. &&
 make &&
 sudo make install
-```
 ```
 ## Testing
 ```bash
