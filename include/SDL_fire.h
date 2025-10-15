@@ -35,6 +35,10 @@ SOFTWARE.
 /** Declaration of the opaque SDL_Fire struct. */
 typedef struct SDL_Fire SDL_Fire;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** Creates a new instance of SDL_Fire.
  * \param base The rect wher the fire originates.
  * \param col The color of the base.
@@ -72,5 +76,9 @@ void SDL_DestroyFire(SDL_Fire *fire);
 /** Returns a string containing the latest error information
  * or NULL.  */
 const char *SDL_FireGetError();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
