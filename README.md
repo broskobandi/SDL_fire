@@ -6,6 +6,7 @@ to be used in a pixel-art setting.
 ![gif](example/fire.gif)
 ## Prerequisites
 - SDL2
+- cmake (for building the library)
 - [ctest](https://github.com/broskobandi/ctest.git) (for running the tests)
 ## Usage
 ```c
