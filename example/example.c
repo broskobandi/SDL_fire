@@ -4,7 +4,6 @@
 #include <stdlib.h>
 /* Include the library. */
 #include <SDL_fire.h>
-#include <stdio.h>
 
 int main(void) {
 	/* Set up the SDL session. */
@@ -20,9 +19,9 @@ int main(void) {
 	/* Create the SDL_Fire object. */
 	SDL_FRect base = {0, 0, 16.0f, 16.0f};
 	SDL_Color col = {255, 100, 0, 255};
-	Uint32 ticks_per_change = 1;
-	float speed = 7.0f;
-	Uint8 num_particles = 15;
+	Uint32 ticks_per_change = 10;
+	float speed = 6.5f;
+	Uint8 num_particles = 25;
 	SDL_Fire *fire = SDL_CreateFire(base, col, ticks_per_change, speed, num_particles);
 	assert(fire);
 
@@ -45,7 +44,6 @@ int main(void) {
 		 * position in this example).
 		 * Generate a random direction for a newly emitted particle: */
 		SDL_FireEmission emission = (SDL_FireEmission)rand() % SDL_FIRE_EMISSION_COUNT;
-		printf("%d\n", emission);
 		assert(!SDL_UpdateFire(fire, fmouse_pos, SDL_GetTicks(), emission));
 
 		/* Draw the SDL_Fire object. */

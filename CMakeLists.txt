@@ -28,7 +28,7 @@ target_include_directories(${LIB_SH} PRIVATE ${INC_DIR})
 target_include_directories(${LIB_ST} PRIVATE ${INC_DIR})
 target_include_directories(example PRIVATE ${INC_DIR})
 target_include_directories(test PRIVATE ${INC_DIR} ${INC_DIR} ${SRC_DIR})
-target_link_libraries(test PRIVATE SDL2 ctest)
+target_link_libraries(test PRIVATE SDL2 ctest m)
 target_link_libraries(example PRIVATE SDL2 ${LIB_SH})
 
 install(TARGETS ${LIB_ST} ARCHIVE DESTINATION lib)

@@ -77,22 +77,22 @@ int SDL_UpdateFire(
 		return 1;
 	}
 
-	fire->base.x = (float)new_pos.x;
-	fire->base.y = (float)new_pos.y;
-
 	static Uint32 time_of_last_change = 0;
 
 	if (cur_time - time_of_last_change < fire->ticks_per_change)
 		return 0;
+
+	fire->base.x = (float)new_pos.x;
+	fire->base.y = (float)new_pos.y;
 
 	time_of_last_change = cur_time;
 
 	for (int i = 0; i < fire->num_particles; i++) {
 		Particle *p = &fire->particles[i];
 		if (p->is_active) {
-			if (p->speed >= p->speed)
-				p->frect.y -= p->speed;
-			p->speed -= SPEED_CHANGE_FACTOR;
+			p->frect.y -= p->speed;
+			if (p->speed >= SPEED_CHANGE_FACTOR)
+				p->speed -= SPEED_CHANGE_FACTOR;
 			if (p->col.r >= COL_CHANGE_FACTOR)
 				p->col.r -= COL_CHANGE_FACTOR;
 			if (p->col.g >= COL_CHANGE_FACTOR)
@@ -104,7 +104,9 @@ int SDL_UpdateFire(
 			if (
 				p->col.a < COL_CHANGE_FACTOR ||
 				p->speed < SPEED_CHANGE_FACTOR)
+			{
 				p->is_active = false;
+			}
 		}
 		if (!p->is_active && emission != SDL_FIRE_EMISSION_NONE) {
 			p->is_active = true;
