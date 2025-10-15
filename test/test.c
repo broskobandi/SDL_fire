@@ -1,10 +1,8 @@
 #include "SDL_fire_priv.h"
 #include <ctest.h>
 #include <math.h>
-#include <stdbool.h>
 
-/** Returns true if a and b are the same, otherwise false. */
-bool fcmp(float a, float b) {
+int fcmp(float a, float b) {
 	return fabsf(a - b) < 0.00001;
 }
 
@@ -67,7 +65,6 @@ int main(void) {
 	CTEST(fire->particles[1].frect.w == fire->base.w);
 	CTEST(fire->particles[1].frect.h == fire->base.h);
 	CTEST(fire->particles[1].speed == fire->default_speed);
-
 
 	ctest_print_results();
 	return 0;
