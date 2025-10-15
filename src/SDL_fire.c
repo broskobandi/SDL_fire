@@ -43,9 +43,9 @@ SDL_Fire *SDL_CreateFire(
 	SDL_Color col,
 	Uint32 ticks_per_change,
 	float speed,
-	Uint8 num_particles)
+	int num_particles)
 {
-	SDL_Fire *fire = malloc(sizeof(SDL_Fire));
+	SDL_Fire *fire = carena_alloc(sizeof(SDL_Fire));
 	if (!fire) {
 		g_err = "Failed to create SDL_Fire.";
 		return NULL;
@@ -53,14 +53,20 @@ SDL_Fire *SDL_CreateFire(
 	fire->base = base;
 	fire->col = col;
 	fire->ticks_per_change = ticks_per_change;
-	fire->num_particles = num_particles;
 	fire->default_speed = speed;
-	for (int i = 0; i < fire->num_particles; i++) {
-		Particle *p = &fire->particles[i];
-		p->col = col;
-		p->frect = base;
-		p->speed = fire->default_speed;
-		p->is_active = false;
+	fire->particles = vParticle_new();
+	if (!fire->particles) {
+		g_err = "Failed to create particles vector.";
+		return NULL;
+	}
+	for (int i = 0; i < num_particles; i++) {
+		Particle p = {
+			.frect = base,
+			.col = col,
+			.is_active = false,
+			.speed = speed
+		};
+		vParticle_push_back(fire->particles, p);
 	}
 	return fire;
 }
@@ -87,8 +93,8 @@ int SDL_UpdateFire(
 
 	time_of_last_change = cur_time;
 
-	for (int i = 0; i < fire->num_particles; i++) {
-		Particle *p = &fire->particles[i];
+	for (size_t i = 0; i < vParticle_len(fire->particles); i++) {
+		Particle *p = vParticle_ptr(fire->particles, i);
 		if (p->is_active) {
 			p->frect.y -= p->speed;
 			if (p->speed >= SPEED_CHANGE_FACTOR)
@@ -142,8 +148,8 @@ int SDL_DrawFire(SDL_Fire *fire, SDL_Renderer *ren) {
 		return 1;
 	}
 
-	for (int i = 0; i < fire->num_particles; i++) {
-		Particle *p = &fire->particles[i];
+	for (size_t i = 0; i < vParticle_len(fire->particles); i++) {
+		Particle *p = vParticle_ptr(fire->particles, i);
 		if (!p->is_active) continue;
 		if (SDL_SetRenderDrawColor(
 			ren, p->col.r, p->col.g, p->col.b, p->col.a)) {
@@ -167,7 +173,7 @@ int SDL_DrawFire(SDL_Fire *fire, SDL_Renderer *ren) {
 /** Destroys an SDL_Fire object.
  * \param fire A pointer to the fire object. */
 void SDL_DestroyFire(SDL_Fire *fire) {
-	if (fire) free(fire);
+	if (fire) carena_free(fire);
 }
 
 /** Returns a string containing the latest error information

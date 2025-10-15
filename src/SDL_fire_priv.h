@@ -33,10 +33,8 @@ SOFTWARE.
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_timer.h>
 #include <stdbool.h>
-#include <stdlib.h>
-
-/** The maximum number of particles */
-#define MAX_PARTICLES 256
+#include <carena.h>
+#include <cvec.h>
 
 /** Each particle's speed is reduced by this per update. */
 #define SPEED_CHANGE_FACTOR 0.1f
@@ -61,15 +59,13 @@ typedef struct {
 
 } Particle;
 
+CVEC_TYPEDEF(Particle);
+
 /** Definition of the opaque SDL_Fire struct. */
 struct SDL_Fire {
 
-	/** Buffer for the particles. */
-	Particle particles[MAX_PARTICLES];
-
-	/** The user defined maximum number of
-	 * particles in the instance. */
-	Uint8 num_particles;
+	/** A vector of particles. */
+	vParticle *particles;
 
 	/** The rect from which all particles originate. */
 	SDL_FRect base;

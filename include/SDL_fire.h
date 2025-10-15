@@ -59,7 +59,7 @@ SDL_Fire *SDL_CreateFire(
 	SDL_Color col,
 	Uint32 ticks_per_change,
 	float speed,
-	Uint8 num_particles
+	int num_particles
 );
 
 /** Updates an SDL_Fire object.
