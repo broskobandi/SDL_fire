@@ -4,6 +4,7 @@
 #include <stdlib.h>
 /* Include the library. */
 #include <SDL_fire.h>
+#include <stdio.h>
 
 int main(void) {
 	/* Set up the SDL session. */
@@ -17,10 +18,12 @@ int main(void) {
 	SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
 
 	/* Create the SDL_Fire object. */
-	SDL_FRect base = {400, 300, 16.0f, 16.0f};
+	SDL_FRect base = {0, 0, 16.0f, 16.0f};
 	SDL_Color col = {255, 100, 0, 255};
-	SDL_Fire *fire = SDL_CreateFire(
-		base, col, 10, 20, 5.0, 32);
+	Uint32 ticks_per_change = 1;
+	float speed = 7.0f;
+	Uint8 num_particles = 15;
+	SDL_Fire *fire = SDL_CreateFire(base, col, ticks_per_change, speed, num_particles);
 	assert(fire);
 
 	/* Generate random seed. */
@@ -39,8 +42,11 @@ int main(void) {
 		fmouse_pos.y = (float)mouse_pos.y;
 
 		/* Update the fire position (we're using the mouse 
-		 * position in this example). */
-		assert(!SDL_UpdateFire(fire, fmouse_pos));
+		 * position in this example).
+		 * Generate a random direction for a newly emitted particle: */
+		SDL_FireEmission emission = (SDL_FireEmission)rand() % SDL_FIRE_EMISSION_COUNT;
+		printf("%d\n", emission);
+		assert(!SDL_UpdateFire(fire, fmouse_pos, SDL_GetTicks(), emission));
 
 		/* Draw the SDL_Fire object. */
 		assert(!SDL_DrawFire(fire, ren));

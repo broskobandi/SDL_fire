@@ -39,20 +39,25 @@ typedef struct SDL_Fire SDL_Fire;
 extern "C" {
 #endif
 
+typedef enum SDL_FireEmission {
+	SDL_FIRE_EMISSION_NONE,
+	SDL_FIRE_EMISSION_LEFT,
+	SDL_FIRE_EMISSION_RIGHT,
+	SDL_FIRE_EMISSION_MIDDLE,
+} SDL_FireEmission;
+#define SDL_FIRE_EMISSION_COUNT (SDL_FireEmission)(SDL_FIRE_EMISSION_MIDDLE + 1)
+
 /** Creates a new instance of SDL_Fire.
- * \param base The rect wher the fire originates.
+ * \param base The rect where the fire originates.
  * \param col The color of the base.
  * \param ticks_per_change The number of ticks to pass between updates.
- * \param frequency The frequency with which new particles are emitted
- * (the actual frequency is a random number influenced by this data).
- * \param speed The original speed of new particles. 
+ * \param speed The initial speed of new particles. 
  * \param num_particles The maximum number of particles that can be emitted.
  * \return A pointer to the SDL_Fire object. */
 SDL_Fire *SDL_CreateFire(
 	SDL_FRect base,
 	SDL_Color col,
 	Uint32 ticks_per_change,
-	int frequency,
 	float speed,
 	Uint8 num_particles
 );
@@ -61,7 +66,7 @@ SDL_Fire *SDL_CreateFire(
  * \param fire A pointer to the SDL_Fire object.
  * \param new_pos The new position of the base rect.
  * \return 0 on success or 1 on failure. */
-int SDL_UpdateFire(SDL_Fire *fire, SDL_FPoint new_pos);
+int SDL_UpdateFire(SDL_Fire *fire, SDL_FPoint new_pos, Uint32 cur_time, SDL_FireEmission emission);
 
 /** Draws an SDL_Fire object.
  * \param fire A pointer to the SDL_Fire object.

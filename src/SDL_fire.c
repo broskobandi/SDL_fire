@@ -27,73 +27,14 @@ SOFTWARE.
  * \details This file contains the implementation of public functions and 
  * the SDL_Fire type. */
 
-#include "SDL_fire.h"
-#include <SDL2/SDL_render.h>
-#include <SDL2/SDL_timer.h>
-#include <stdbool.h>
-#include <stdlib.h>
-
-/** The maximum number of particles */
-#define MAX_PARTICLES 256
-
-/** Each particle's speed is reduced by this per update. */
-#define SPEED_CHANGE_FACTOR 0.1f
-
-/** Each particle's color values are reduced by this per update. */
-#define COL_CHANGE_FACTOR 5
-
-/** A struct containing particle information. */
-typedef struct {
-
-	/** The particle's rect. */
-	SDL_FRect frect;
-
-	/** The particle's original color. */
-	SDL_Color col;
-
-	/** Boolean indicating whether the particle is active. */
-	bool is_active;
-
-	/** The current speed of the particle.  */
-	float speed;
-
-} Particle;
-
-/** Definition of the opaque SDL_Fire struct. */
-struct SDL_Fire {
-
-	/** Buffer for the particles. */
-	Particle particles[MAX_PARTICLES];
-
-	/** The user defined maximum number of
-	 * particles in the instance. */
-	Uint8 num_particles;
-
-	/** The rect from which all particles originate. */
-	SDL_FRect base;
-
-	/** The color of the base. */
-	SDL_Color col;
-
-	/** The number of the ticks to pass between updates. */
-	Uint32 ticks_per_change;
-
-	/** Data used in calculating a random value for emitting
-	 * new particles. */
-	int frequency;
-
-	/** The initial speed of each particle. */
-	float default_speed;
-};
+#include "SDL_fire_priv.h"
 
 _Thread_local static const char *g_err;
 
 /** Creates a new instance of SDL_Fire.
- * \param base The rect wher the fire originates.
+ * \param base The rect where the fire originates.
  * \param col The color of the base.
  * \param ticks_per_change The number of ticks to pass between updates.
- * \param frequency The frequency with which new particles are emitted
- * (the actual frequency is a random number influenced by this data).
  * \param speed The original speed of new particles. 
  * \param num_particles The maximum number of particles that can be emitted.
  * \return A pointer to the SDL_Fire object. */
@@ -101,7 +42,6 @@ SDL_Fire *SDL_CreateFire(
 	SDL_FRect base,
 	SDL_Color col,
 	Uint32 ticks_per_change,
-	int frequency,
 	float speed,
 	Uint8 num_particles)
 {
@@ -114,7 +54,6 @@ SDL_Fire *SDL_CreateFire(
 	fire->col = col;
 	fire->ticks_per_change = ticks_per_change;
 	fire->num_particles = num_particles;
-	fire->frequency = frequency;
 	fire->default_speed = speed;
 	for (int i = 0; i < fire->num_particles; i++) {
 		Particle *p = &fire->particles[i];
@@ -130,7 +69,9 @@ SDL_Fire *SDL_CreateFire(
  * \param fire A pointer to the SDL_Fire object.
  * \param new_pos The new position of the base rect.
  * \return 0 on success or 1 on failure. */
-int SDL_UpdateFire(SDL_Fire *fire, SDL_FPoint new_pos) {
+int SDL_UpdateFire(
+	SDL_Fire *fire, SDL_FPoint new_pos, Uint32 cur_time, SDL_FireEmission emission) 
+{
 	if (!fire) {
 		g_err = "Invalid argument.";
 		return 1;
@@ -141,10 +82,10 @@ int SDL_UpdateFire(SDL_Fire *fire, SDL_FPoint new_pos) {
 
 	static Uint32 time_of_last_change = 0;
 
-	if (SDL_GetTicks() - time_of_last_change < fire->ticks_per_change)
+	if (cur_time - time_of_last_change < fire->ticks_per_change)
 		return 0;
 
-	time_of_last_change = SDL_GetTicks();
+	time_of_last_change = cur_time;
 
 	for (int i = 0; i < fire->num_particles; i++) {
 		Particle *p = &fire->particles[i];
@@ -165,24 +106,21 @@ int SDL_UpdateFire(SDL_Fire *fire, SDL_FPoint new_pos) {
 				p->speed < SPEED_CHANGE_FACTOR)
 				p->is_active = false;
 		}
-		if (
-			!p->is_active &&
-			rand() % fire->frequency == rand() % fire->frequency)
-		{
+		if (!p->is_active && emission != SDL_FIRE_EMISSION_NONE) {
 			p->is_active = true;
 			p->speed = fire->default_speed;
-			/* p->speed_change_factor = SPEED_CHANGE_FACTOR; */
 			p->col = fire->col;
 			p->frect = fire->base;
-			int roll = rand() % 3;
-			switch (roll) {
-				case 0:
-					p->frect.x += p->frect.w / 2;
-					break;
-				case 1:
+			switch (emission) {
+				case SDL_FIRE_EMISSION_LEFT:
 					p->frect.x -= p->frect.w / 2;
 					break;
-				case 2:
+				case SDL_FIRE_EMISSION_RIGHT:
+					p->frect.x += p->frect.w / 2;
+					break;
+				case SDL_FIRE_EMISSION_MIDDLE:
+					break;
+				case SDL_FIRE_EMISSION_NONE:
 					break;
 			}
 			break;
